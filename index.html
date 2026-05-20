@@ -94,14 +94,20 @@
       return value.replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
     }
 
+    function normalizePlate(plate) {
+      return plate.replace(/[A-Za-z]/g, (ch) => ch.toUpperCase() === 'Y' ? 'y' : ch.toUpperCase());
+    }
+
     function render(records) {
       const groups = new Map();
       for (const record of records) {
         const owner = (record.MasterOfCar || record['Master Of Car'] || '').replaceAll('_', '/').trim();
-        const plate = (record.PlateNumber || record['Plate Number'] || '').trim();
+        const plate = normalizePlate((record.PlateNumber || record['Plate Number'] || '').trim());
         if (!owner || !plate) continue;
         if (!groups.has(owner)) groups.set(owner, []);
-        groups.get(owner).push(plate);
+        if (!groups.get(owner).some((item) => item.toUpperCase() === plate.toUpperCase())) {
+          groups.get(owner).push(plate);
+        }
       }
       if (!groups.has(fallbackOwner)) {
         groups.set(fallbackOwner, [...fallbackPlates]);
