@@ -1,4 +1,4 @@
-RecNo,AuthorityList,BeginTime,CancelTime,CardID,MasterOfCar,PlateNumber
+﻿RecNo,AuthorityList,BeginTime,CancelTime,CardID,MasterOfCar,PlateNumber
 3092,"{""OpenGate"":true}",2025-01-01 00:00:00,2037-01-01 23:59:59,157,37/1,007ACK05
 3307,"{""OpenGate"":true}",2025-01-01 00:00:00,2037-01-01 23:59:59,376,74/3,01720ALX
 3715,"{""OpenGate"":true}",2026-05-20 00:00:00,2034-05-31 23:59:59,597,400_1,0206HP5
