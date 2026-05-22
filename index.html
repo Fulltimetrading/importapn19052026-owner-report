@@ -44,6 +44,7 @@
   </main>
   <script>
     const csvUrl = 'data/importAPN19052026.csv';
+    const metaUrl = 'data/importAPN19052026.updated.json';
     const fallbackOwner = '63/2';
     const fallbackPlates = ['A351MC193', 'A357BM193', 'C387Oy193', 'H655KA75', 'O065KP75', 'O524KA75'];
     const rowsContainer = document.getElementById('owner-rows');
@@ -95,7 +96,8 @@
     }
 
     function normalizePlate(plate) {
-      return plate.replace(/[A-Za-z]/g, (ch) => ch.toUpperCase() === 'Y' ? 'y' : ch.toUpperCase());
+      const normalized = plate.replace(/[A-Za-z]/g, (ch) => ch.toUpperCase() === 'Y' ? 'y' : ch.toUpperCase());
+      return normalized.toUpperCase() === 'P831YKI193' ? 'P831yK193' : normalized;
     }
 
     function render(records) {
@@ -154,15 +156,16 @@
     }
 
     searchInput.addEventListener('input', (event) => filterRows(event.target.value));
-    fetch(csvUrl, { cache: 'no-store' })
-      .then((response) => {
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const modified = response.headers.get('Last-Modified');
-        if (modified) {
-          document.getElementById('updated-at').textContent = `Обновлено: ${new Date(modified).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })} МСК`;
+    fetch(metaUrl, { cache: 'no-store' })
+      .then((response) => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); })
+      .then((meta) => {
+        if (meta.updated_at) {
+          document.getElementById('updated-at').textContent = `Обновлено: ${new Date(meta.updated_at).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })} МСК`;
         }
-        return response.text();
       })
+      .catch(() => {});
+    fetch(csvUrl, { cache: 'no-store' })
+      .then((response) => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.text(); })
       .then((text) => render(parseCsv(text)))
       .catch(() => { rowsContainer.innerHTML = '<section class="owner-row"><div class="plates">Не удалось загрузить данные.</div></section>'; });
   </script>
