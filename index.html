@@ -105,7 +105,7 @@
       for (const record of records) {
         const owner = (record.MasterOfCar || record['Master Of Car'] || '').replaceAll('_', '/').trim();
         const plate = normalizePlate((record.PlateNumber || record['Plate Number'] || '').trim());
-        if (!owner || !plate) continue;
+        if (!owner || !/^\d/.test(owner) || !plate) continue;
         if (!groups.has(owner)) groups.set(owner, []);
         if (!groups.get(owner).some((item) => item.toUpperCase() === plate.toUpperCase())) {
           groups.get(owner).push(plate);
