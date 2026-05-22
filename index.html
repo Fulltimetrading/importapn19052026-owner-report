@@ -38,7 +38,7 @@
 </head>
 <body>
   <main>
-    <header><div><h1>Сводка номеров по владельцам</h1></div><div class="stats"><div class="stat"><b id="owners-count">0</b><span>владельцев</span></div><div class="stat"><b id="plates-count">0</b><span>номеров</span></div></div></header>
+    <header><div><h1>Сводка номеров по владельцам</h1><div class="meta" id="updated-at">Обновлено: —</div></div><div class="stats"><div class="stat"><b id="owners-count">0</b><span>владельцев</span></div><div class="stat"><b id="plates-count">0</b><span>номеров</span></div></div></header>
     <div class="toolbar"><input id="search" type="search" placeholder="Поиск по owner или номеру" autocomplete="off"></div>
     <div class="table"><div class="table-head"><span></span><span>Owner</span><span>Доля</span><span>Номеров</span></div><div id="owner-rows"></div></div>
   </main>
@@ -155,7 +155,14 @@
 
     searchInput.addEventListener('input', (event) => filterRows(event.target.value));
     fetch(csvUrl, { cache: 'no-store' })
-      .then((response) => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.text(); })
+      .then((response) => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const modified = response.headers.get('Last-Modified');
+        if (modified) {
+          document.getElementById('updated-at').textContent = `Обновлено: ${new Date(modified).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })} МСК`;
+        }
+        return response.text();
+      })
       .then((text) => render(parseCsv(text)))
       .catch(() => { rowsContainer.innerHTML = '<section class="owner-row"><div class="plates">Не удалось загрузить данные.</div></section>'; });
   </script>
